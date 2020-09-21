@@ -25,7 +25,7 @@ one_hot = False
 
 from string import punctuation
 def strip_punctuation(s):
-	return s.translate(string.maketrans("",""), string.punctuation)		# python2---del punctuations
+	return s.translate(str.maketrans("",""), string.punctuation)		# python2---del punctuations
     # return ''.join(c for c in s if c not in punctuation)
 
 def process_text(x):
