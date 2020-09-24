@@ -25,7 +25,7 @@ one_hot = False
 
 from string import punctuation
 def strip_punctuation(s):
-	return s.translate(str.maketrans("",""), string.punctuation)		# python2---del punctuations
+	return s.translate(str.maketrans("",""))		# python2---del punctuations
     # return ''.join(c for c in s if c not in punctuation)
 
 def process_text(x):
@@ -299,15 +299,15 @@ import pickle
 
 dimensions = 300
 
-glove_path = './embeddings/glove_{}_{}.pkl'.format(dataset, mode)
+glove_path = 'embeddings/glove_{}_{}.pkl'.format(dataset, mode)
 if(os.path.isfile(glove_path)):
 	print("Reusing glove dictionary to save time")
-	with open(glove_path,'r') as f:
+	with open(glove_path,'rb') as f:
 		glove = pickle.load(f)
 	save = False
 else:
 	# Load word embeddings
-	with open('../glove_embeddings/glove.840B.{}d.txt'.format(dimensions), 'r') as f:
+	with open('glove_embeddings/glove.840B.{}d.txt'.format(dimensions), 'r') as f:
 		lines = f.readlines()
 		for l in tqdm(lines):
 			vec = l.split(' ')
@@ -343,7 +343,7 @@ for i in tqdm(range(2, len(word_index))):
 		# print(word)
 
 if(save == True):
-	with open(glove_path, 'w+') as f:
+	with open(glove_path, 'wb+') as f:
 		pickle.dump(filtered_glove, f)
 	print("Saving glove dict to file")
 
@@ -354,10 +354,9 @@ print("Saving glove vectors")
 env['glove'] = matrix
 
 if(toy):
-	file_path = './store/{}_{}_toy.pkl'.format(dataset, mode)
+	file_path = 'store/{}_{}_toy.pkl'.format(dataset, mode)
 else:
-	file_path = './store/{}_{}.pkl'.format(dataset, mode)
-with open(file_path, 'w+') as f:
+	file_path = 'store/{}_{}.pkl'.format(dataset, mode)
+with open(file_path, 'wb+') as f:
 	pickle.dump(env, f)
 # dictToFile(env,'./store/{}_Cat.json.gz'.format(dataset))
-
