@@ -43,8 +43,8 @@ def clip_gradient(model, clip):
 def repackage_hidden(h):
     """Wraps hidden states in new Variables, to detach them from their history."""
     # What's this?
-    if type(h) == Variable:
-        return Variable(h.data)
+    if type(h) == torch.Tensor:
+        return h
     else:
         return tuple(repackage_hidden(v) for v in h)
 
@@ -102,11 +102,11 @@ class BaseExperiment:
         random.seed(self.args.seed)
         # Load Data files for training
         if self.args.toy:
-            file_path = './store/{}_{}_{}.pkl'.format(self.args.dataset, self.args.mode, 'toy')
+            file_path = 'store/{}_{}_{}.pkl'.format(self.args.dataset, self.args.mode, 'toy')
         else:
-            file_path = './store/{}_{}.pkl'.format(self.args.dataset, self.args.mode)
+            file_path = 'store/{}_{}.pkl'.format(self.args.dataset, self.args.mode)
 
-        with open(file_path,'r') as f:
+        with open(file_path,'rb') as f:
             self.env = pickle.load(f)
 
         print('Stored Environment:{}'.format(self.env.keys()))
@@ -129,7 +129,7 @@ class BaseExperiment:
 
     def make_dir(self):
         if(self.args.log == 1):
-            self.out_dir = './logs/{}/{}/{}/{}/'.format(self.mode, self.dataset, self.model_name, self.uuid)
+            self.out_dir = 'logs/{}/{}/{}/{}/'.format(self.mode, self.dataset, self.model_name, self.uuid)
             self.mkdir_p(self.out_dir)
             self.mdl_path = self.out_dir + '/mdl.ckpt'  # What is the new file format?
             self.path = self.out_dir + '/logs.txt'
@@ -175,7 +175,7 @@ class BaseExperiment:
         sentence, targets, actual_batch = self.make_batch(x, -1, evaluation=True)
         output, hidden = self.mdl(sentence, hidden)
         loss = self.criterion(output, targets).data     # cross entropy
-        print("Test loss={}".format(loss[0]))
+        print("Test loss={}".format(loss.item()))
         accuracy = self.get_accuracy(output, targets)
 
     def evaluate_target(self, x, eval_type='test'):
@@ -285,7 +285,7 @@ class BaseExperiment:
             for p in self.mdl.parameters():
                 p.grad.mul_(coeff)
         self.optimizer.step()
-        return loss.data[0]
+        return loss.item()
 
     def train_batch(self, i):
         ''' Trains a regular RNN model'''
@@ -303,7 +303,7 @@ class BaseExperiment:
             for p in self.mdl.parameters():
                 p.grad.mul_(coeff)
         self.optimizer.step()
-        return loss.data[0]
+        return loss.item()
 
     def train(self):
         print("Starting training")
@@ -338,4 +338,3 @@ class BaseExperiment:
 if __name__ == '__main__':
     exp = BaseExperiment()
     exp.train()
-
